@@ -57,7 +57,6 @@ def add_monitor_task(source_id, dest_id, copied_map=None):
     if copied_map is None:
         copied_map = {}
     tasks = load_json(MONITOR_TASKS_FILE)
-    # Проверяем, существует ли задача с такими путями
     for t in tasks:
         if t["source_folder_id"] == source_id and t["dest_folder_id"] == dest_id:
             return False
@@ -98,19 +97,15 @@ def check_monitor_tasks(log_callback):
     for task in tasks:
         source_id = task["source_folder_id"]
         dest_id = task["dest_folder_id"]
-        # Если в задаче нет словаря, создаём его
         copied_map = task.get("copied_files", {})
-        # Вызываем рекурсивное копирование; функция возвращает обновлённый словарь
         try:
             new_map = copy_new_items(source_id, dest_id, copied_map.copy(), base_path="")
         except Exception as e:
             log_callback(f"[Мониторинг] Ошибка копирования: {e}")
             continue
-        # Если появились новые объекты (увеличился размер словаря)
         if len(new_map) > len(copied_map):
             task["copied_files"] = new_map
             updated = True
-            # Логирование нового копирования (упрощённо)
             log_callback(f"[Мониторинг] Обнаружены и скопированы новые файлы/папки.")
     if updated:
         save_json(MONITOR_TASKS_FILE, tasks)
@@ -147,11 +142,19 @@ class DriveApp:
             btn = tk.Button(self.frame_commands, text=text, width=12, command=cmd)
             btn.pack(side=tk.LEFT, padx=5)
 
-        self.log_area = tk.scrolledtext.ScrolledText(master, width=100, height=25)
+        self.log_area = scrolledtext.ScrolledText(master, width=100, height=25)
         self.log_area.pack(padx=10, pady=10)
 
-        self.monitor_thread = threading.Thread(target=monitor_worker, args=(self.log,), daemon=True)
+        # Запускаем фоновый мониторинг в отдельном потоке
+        self.monitor_thread = threading.Thread(target=monitor_worker, args=(self.threadsafe_log,), daemon=True)
         self.monitor_thread.start()
+
+    def threadsafe_log(self, message):
+        """
+        Безопасная обёртка для записи в log_area из фонового потока.
+        Используем метод after, чтобы вызывать self.log в основном потоке Tkinter.
+        """
+        self.master.after(0, lambda: self.log(message))
 
     def log(self, message):
         self.log_area.insert(tk.END, message + "\n")
@@ -181,22 +184,24 @@ class DriveApp:
                 messagebox.showerror("Ошибка", "Не удалось извлечь ID целевой папки.")
                 return
 
-        try:
-            # Рекурсивно копируем все файлы и подпапки
-            copied_map = copy_new_items(source_id, dest_id, {}, base_path="")
-        except Exception as e:
-            self.log(f"Ошибка при копировании: {e}")
-            return
+        # Запускаем копирование в фоновом потоке
+        def worker():
+            self.threadsafe_log("Начинаем рекурсивное копирование...")
+            try:
+                copied_map = copy_new_items(source_id, dest_id, {}, base_path="")
+                self.threadsafe_log(f"Копирование завершено. Скопировано объектов: {len(copied_map)}")
+                # Проверяем, нет ли уже задачи мониторинга
+                tasks = get_monitor_tasks()
+                exists = any(t["source_folder_id"] == source_id and t["dest_folder_id"] == dest_id for t in tasks)
+                if not exists:
+                    add_monitor_task(source_id, dest_id, copied_map)
+                    self.threadsafe_log("Задача мониторинга создана.")
+                add_change_record("copy", "(множество объектов)", "(множество)",
+                                  source_id, dest_id, "Рекурсивное копирование через Copy")
+            except Exception as e:
+                self.threadsafe_log(f"Ошибка при копировании: {e}")
 
-        self.log(f"Копирование завершено. Скопировано объектов: {len(copied_map)}")
-        # Если в исходной папке еще не создана задача мониторинга – создаем её
-        tasks = get_monitor_tasks()
-        exists = any(t["source_folder_id"] == source_id and t["dest_folder_id"] == dest_id for t in tasks)
-        if not exists:
-            add_monitor_task(source_id, dest_id, copied_map)
-            self.log("Задача мониторинга создана.")
-
-        add_change_record("copy", "(множество объектов)", "(множество)", source_id, dest_id, "Рекурсивное копирование через Copy")
+        threading.Thread(target=worker, daemon=True).start()
 
     def show_monitor_tasks(self):
         tasks = get_monitor_tasks()
@@ -237,17 +242,21 @@ class DriveApp:
             if not dest_id:
                 messagebox.showerror("Ошибка", "Не удалось извлечь ID целевой папки.")
                 return
-        try:
-            # При создании задачи сразу копируем все существующие объекты
-            copied_map = copy_new_items(source_id, dest_id, {}, base_path="")
-        except Exception as e:
-            self.log(f"Ошибка при первоначальном копировании: {e}")
-            return
 
-        if add_monitor_task(source_id, dest_id, copied_map):
-            self.log(f"Новая задача мониторинга добавлена:\nИсходная: {source_id}\nЦелевая: {dest_id}")
-        else:
-            self.log("Такая задача уже существует!")
+        # Запускаем копирование (при создании задачи) в фоновом потоке
+        def worker():
+            self.threadsafe_log("Идёт первичное копирование для AddMonitor...")
+            try:
+                copied_map = copy_new_items(source_id, dest_id, {}, base_path="")
+                if add_monitor_task(source_id, dest_id, copied_map):
+                    self.threadsafe_log(f"Новая задача мониторинга добавлена:\n"
+                                        f"Исходная: {source_id}\nЦелевая: {dest_id}")
+                else:
+                    self.threadsafe_log("Такая задача уже существует!")
+            except Exception as e:
+                self.threadsafe_log(f"Ошибка при первоначальном копировании: {e}")
+
+        threading.Thread(target=worker, daemon=True).start()
 
     def remove_monitor_task_cmd(self):
         source_link = simpledialog.askstring("RemoveMonitor", "Введите ссылку на исходную папку:")
@@ -295,7 +304,7 @@ class DriveApp:
         report = "\n".join(report_lines)
         win = tk.Toplevel(self.master)
         win.title("Отчёт изменений")
-        txt = tk.scrolledtext.ScrolledText(win, width=100, height=30)
+        txt = scrolledtext.ScrolledText(win, width=100, height=30)
         txt.insert(tk.END, report)
         txt.pack()
 
@@ -310,7 +319,7 @@ class DriveApp:
         report = get_file_hierarchy(folder_id)
         win = tk.Toplevel(self.master)
         win.title("Отчёт по папке")
-        txt = tk.scrolledtext.ScrolledText(win, width=100, height=30)
+        txt = scrolledtext.ScrolledText(win, width=100, height=30)
         txt.insert(tk.END, report)
         txt.pack()
 
