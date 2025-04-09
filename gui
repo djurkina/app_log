@@ -4,6 +4,7 @@ import threading
 import time
 import json
 from datetime import datetime
+import queue
 
 from drive_service import (
     extract_file_id, extract_folder_id, list_files_in_folder,
@@ -16,6 +17,8 @@ from config import GOOGLE_ROOT_ID
 MONITOR_TASKS_FILE = "monitor_tasks.json"
 CHANGES_LOG_FILE = "changes_log.json"
 
+# Очередь для логирования сообщений из фоновых потоков
+log_queue = queue.Queue()
 
 def load_json(filepath: str):
     try:
@@ -24,14 +27,12 @@ def load_json(filepath: str):
     except Exception:
         return []
 
-
 def save_json(filepath: str, data):
     try:
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
     except Exception as e:
-        print(f"Ошибка записи файла {filepath}: {e}")
-
+        print(f"Error saving {filepath}: {e}")
 
 def add_change_record(operation, file_name, file_id, source_id="", dest_id="", comment=""):
     log_data = load_json(CHANGES_LOG_FILE)
@@ -46,7 +47,6 @@ def add_change_record(operation, file_name, file_id, source_id="", dest_id="", c
     }
     log_data.append(record)
     save_json(CHANGES_LOG_FILE, log_data)
-
 
 def add_monitor_task(source_id, dest_id, copied_map=None):
     if copied_map is None:
@@ -63,7 +63,6 @@ def add_monitor_task(source_id, dest_id, copied_map=None):
     save_json(MONITOR_TASKS_FILE, tasks)
     return True
 
-
 def remove_monitor_task(source_id, dest_id):
     tasks = load_json(MONITOR_TASKS_FILE)
     new_tasks = []
@@ -77,10 +76,8 @@ def remove_monitor_task(source_id, dest_id):
         save_json(MONITOR_TASKS_FILE, new_tasks)
     return removed
 
-
 def get_monitor_tasks():
     return load_json(MONITOR_TASKS_FILE)
-
 
 def check_monitor_tasks(log_callback):
     tasks = load_json(MONITOR_TASKS_FILE)
@@ -101,12 +98,10 @@ def check_monitor_tasks(log_callback):
     if updated:
         save_json(MONITOR_TASKS_FILE, tasks)
 
-
 def monitor_worker(log_callback):
     while True:
         check_monitor_tasks(log_callback)
         time.sleep(10)
-
 
 class DriveApp:
     def __init__(self, master):
@@ -114,11 +109,10 @@ class DriveApp:
         master.title("Google Drive Manager")
         master.geometry("900x600")
 
-        # Frame for main commands
+        # Фрейм для основных команд
         self.frame_commands = tk.Frame(master)
         self.frame_commands.pack(side=tk.TOP, fill=tk.X, padx=10, pady=5)
 
-        # List of main commands in one row
         commands = [
             ("Copy", self.copy_files),
             ("Monitor", self.show_monitor_tasks),
@@ -131,7 +125,7 @@ class DriveApp:
             btn = tk.Button(self.frame_commands, text=text, width=20, command=cmd)
             btn.pack(side=tk.LEFT, padx=5)
 
-        # Separate frame for the cancel all operations button
+        # Фрейм для кнопки отмены всех операций
         self.frame_cancel = tk.Frame(master)
         self.frame_cancel.pack(side=tk.TOP, fill=tk.X, padx=10, pady=5)
         btn_cancel = tk.Button(self.frame_cancel, text="Cancel All Operations", width=25, command=self.cancel_all_operations)
@@ -140,12 +134,20 @@ class DriveApp:
         self.log_area = scrolledtext.ScrolledText(master, width=100, height=25)
         self.log_area.pack(padx=10, pady=10)
 
-        # Start background monitoring tasks
+        # Запускаем обработку очереди логов
+        self.master.after(200, self.process_log_queue)
+        # Запускаем фоновые задачи мониторинга
         self.monitor_thread = threading.Thread(target=monitor_worker, args=(self.threadsafe_log,), daemon=True)
         self.monitor_thread.start()
 
+    def process_log_queue(self):
+        while not log_queue.empty():
+            msg = log_queue.get()
+            self.log(msg)
+        self.master.after(200, self.process_log_queue)
+
     def threadsafe_log(self, message):
-        self.master.after(0, lambda: self.log(message))
+        log_queue.put(message)
 
     def log(self, message):
         self.log_area.insert(tk.END, message + "\n")
@@ -270,9 +272,6 @@ class DriveApp:
             self.log("No monitor task found with the given paths.")
 
     def cancel_all_operations(self):
-        """
-        Deletes all objects copied via AddMonitor and clears monitor tasks.
-        """
         self.log("Starting cancellation of all operations...")
         tasks = get_monitor_tasks()
         if not tasks:
@@ -286,7 +285,6 @@ class DriveApp:
                     self.log(f"Deleted object {rel_path} (ID: {obj_id})")
                 except Exception as e:
                     self.log(f"Error deleting object {rel_path}: {e}")
-        # Clear monitor tasks file
         save_json(MONITOR_TASKS_FILE, [])
         self.log("All monitor tasks cancelled; all copied objects deleted.")
 
@@ -339,7 +337,6 @@ class DriveApp:
         except Exception as e:
             self.log(f"Error setting permissions: {e}")
             messagebox.showerror("Error", "Error setting permissions.")
-
 
 if __name__ == '__main__':
     root = tk.Tk()
