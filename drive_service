@@ -144,8 +144,8 @@ def find_folder(name: str, parent_id: str) -> str:
 def create_folder(name: str, parent_id: str) -> str:
     """
     Creates a folder with the given name in the parent folder.
-    If a folder with the same name exists, returns its ID.
-    Logs detailed error information on failure.
+    If a folder with the same name already exists, returns its ID.
+    Logs detailed error info on failure.
     """
     existing_folder_id = find_folder(name, parent_id)
     if existing_folder_id:
@@ -170,9 +170,9 @@ def create_folder(name: str, parent_id: str) -> str:
 def copy_new_items(src_id: str, dest_id: str, copied_map: dict, base_path="") -> dict:
     """
     Recursively copies files and folders from src_id to dest_id.
-    For files, stores the new file ID;
-    for folders – the created folder's ID.
-    base_path is used to build a relative path for logging.
+    For files, stores the new file ID returned by the API.
+    For folders, stores the ID of the created folder.
+    The base_path parameter builds a relative path for logging purposes.
     Returns the updated dictionary.
     """
     items = list_files_in_folder(src_id)
@@ -192,12 +192,16 @@ def copy_new_items(src_id: str, dest_id: str, copied_map: dict, base_path="") ->
                 copied_map[current_path] = new_folder_id
             else:
                 new_folder_id = copied_map[current_path]
+            # Recursively copy the folder contents
             copy_new_items(current_id, new_folder_id, copied_map, current_path)
         else:
             if current_path not in copied_map:
                 try:
                     new_file = copy_file(current_id, current_name, dest_id)
+                    new_id = new_file.get("id")
+                    if not new_id:
+                        raise Exception(f"No ID returned for file {current_name}")
                 except Exception as e:
                     raise Exception(f"Error copying file {current_name}: {e}")
-                copied_map[current_path] = new_file.get("id")
+                copied_map[current_path] = new_id
     return copied_map
