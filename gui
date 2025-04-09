@@ -276,8 +276,6 @@ class DriveApp:
             if not tasks:
                 self.threadsafe_log("No monitor tasks to cancel.")
                 return
-            # Перебираем все задачи мониторинга и выводим информацию о том,
-            # какие именно задачи удаляются
             for task in tasks:
                 source_id = task.get("source_folder_id", "Unknown")
                 dest_id = task.get("dest_folder_id", "Unknown")
@@ -289,7 +287,6 @@ class DriveApp:
                         self.threadsafe_log(f"Deleted object '{rel_path}' (ID: {obj_id})")
                     except Exception as e:
                         self.threadsafe_log(f"Error deleting object '{rel_path}': {e}")
-            # Очистить файл задач мониторинга
             save_json(MONITOR_TASKS_FILE, [])
             self.threadsafe_log("All monitor tasks cancelled; all copied objects deleted.")
         threading.Thread(target=worker, daemon=True).start()
