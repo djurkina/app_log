@@ -1,14 +1,134 @@
-Traceback (most recent call last):
-  File "C:\Users\Admin\PycharmProjects\PythonProject\gui.py", line 347, in <module>
-    root.mainloop()
-    ~~~~~~~~~~~~~^^
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\tkinter\__init__.py", line 1599, in mainloop
-    self.tk.mainloop(n)
-    ~~~~~~~~~~~~~~~~^^^
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\tkinter\__init__.py", line 2063, in __call__
-    def __call__(self, *args):
-    
-KeyboardInterrupt
-
-Process finished with exit code -1073741510 (0xC000013A: interrupted by Ctrl+C)
+Starting cancellation of all operations...
+Cancelling monitor task: Source: 1GGjhdjsKndJ2D_bYmXEuscqU8vjxD0St -> Destination: 1AEU5KOykAcffQJTNvg01Lncp8NsrN2t4
+Error deleting object 'try': RetryError[<Future at 0x22d95fdaed0 state=finished raised HttpError>]
+Skipping deletion of object 'try/u3635397544_A_3D_concept_of_a_detailed_staff_in_the_style_of__56e4adb7-54e3-45f8-b8b3-5707522d0939_2.png': invalid ID 'file'
+Skipping deletion of object 'image (27).png': invalid ID 'file'
+Cancelling monitor task: Source: 1eaT9RQYmJZJrSLDkZyO9okwNwRekrgjM -> Destination: 1c4UtHG1hsE2SavZ-0rgizO7tZhlFWc37
+Skipping deletion of object 'Character_Aylora_for_sim.fbx': invalid ID 'file'
+Error deleting object 'Textures': RetryError[<Future at 0x22d9548c150 state=finished raised HttpError>]
+Skipping deletion of object 'Textures/C_Aylora_Normal_01.1002.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_Albedo_01.1002.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_Albedo_01.1012.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_AmbientOclusion_01.1002.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_Normal_01.1012.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_Roughness_01.1002.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_Metalnes_01.1002.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_Roughness_01.1012.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_AmbientOclusion_01.1012.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_Metalnes_01.1012.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_Albedo_01.1011.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_AmbientOclusion_01.1011.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_Normal_01.1011.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_Roughness_01.1011.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_Metalnes_01.1011.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_Albedo_01.1021.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_Normal_01.1021.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_Roughness_01.1021.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_Albedo_01.1041.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_AmbientOclusion_01.1021.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_Metalnes_01.1021.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_Normal_01.1041.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_Roughness_01.1041.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_AmbientOclusion_01.1041.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_Metalnes_01.1041.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_Albedo_01.1031.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_Normal_01.1031.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_Roughness_01.1031.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_AmbientOclusion_01.1031.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_Metalnes_01.1031.png': invalid ID 'file'
+Skipping deletion of object 'Character_Aylora_02.fbx': invalid ID 'file'
+Skipping deletion of object 'Character_Aylora_Body_01.fbx': invalid ID 'file'
+Cancelling monitor task: Source: 1xs7VQMkRKb7Z1VsLTDYYcA-Dmr7DjO6A -> Destination: 1ITcd6djsS0Zys2Z70sudvKVoK3uuATXy
+Skipping deletion of object 'IMG_1015.png': invalid ID 'file'
+Cancelling monitor task: Source: 1xs7VQMkRKb7Z1VsLTDYYcA-Dmr7DjO6A -> Destination: 1IMW4NX-p-0lSiT_aava7cZiQIVRrXSGv
+Skipping deletion of object 'IMG_1015.png': invalid ID 'file'
+Cancelling monitor task: Source: 1xs7VQMkRKb7Z1VsLTDYYcA-Dmr7DjO6A -> Destination: 1ALBI6G6g4rVZRGH3sKb11LtZkrqV-DQo
+Skipping deletion of object 'IMG_1015.png': invalid ID 'file'
+Cancelling monitor task: Source: 1xs7VQMkRKb7Z1VsLTDYYcA-Dmr7DjO6A -> Destination: 1pVhNk4jQQyPJMLFdRiEh_vLY_9Dqj5a9
+Skipping deletion of object 'IMG_1015.png': invalid ID 'file'
+Cancelling monitor task: Source: 1MCKoOtoFjgRnuLsbaLBJYGgYraa7pKMl -> Destination: 1sL46CjAIVkRECrpC25lsaL5w-a8Y532e
+Cancelling monitor task: Source: 1GGjhdjsKndJ2D_bYmXEuscqU8vjxD0St -> Destination: 1vpoA7FjYEaHDFFrU1KgekWA1h1nvExKG
+Cancelling monitor task: Source: 1GGjhdjsKndJ2D_bYmXEuscqU8vjxD0St -> Destination: 1fIxzQLOJEeujoUAVc9_oQsamBRKJj-ea
+Cancelling monitor task: Source: 1GGjhdjsKndJ2D_bYmXEuscqU8vjxD0St -> Destination: 1VlihvlTVQgJHBSPivJpZXxS9NGTHwPqP
+Cancelling monitor task: Source: 1q-SPmoKl2GVsrLwiuY65IRVtVtwFki5M -> Destination: 1Vc1BWI11B5dxH8AAonGxN19lQoGWyhaU
+Cancelling monitor task: Source: 1q-SPmoKl2GVsrLwiuY65IRVtVtwFki5M -> Destination: 144wKXaIsGwzdjnQRb3ahK_1_LdPpBk86
+Cancelling monitor task: Source: 1q-SPmoKl2GVsrLwiuY65IRVtVtwFki5M -> Destination: 1_zfnrKN8KYFxyitdydu_jrQh3clsPZBP
+Cancelling monitor task: Source: 1miINgYbqmSn9HUhIFVgHX-MskVQplrk3 -> Destination: 1g5wSpN2tc9pDyCdIvW9i_ror-ncN8kPu
+Cancelling monitor task: Source: 1miINgYbqmSn9HUhIFVgHX-MskVQplrk3 -> Destination: 1bD4ApnGsQZ-b8efuJv0NCJ_wfx-WoNxw
+Cancelling monitor task: Source: 1miINgYbqmSn9HUhIFVgHX-MskVQplrk3 -> Destination: 1ROx3vfy7fw72Oue8_om_z_dqQARmCPqt
+Cancelling monitor task: Source: 1_sOGYGW-ruxBZyU8YuHR1n1avVXjRLYM -> Destination: 1IIz-_RL5Ps5voNPpJHIjVIf_HEYS__2f
+Skipping deletion of object '2 (2).jpg': invalid ID 'file'
+Cancelling monitor task: Source: 1eaT9RQYmJZJrSLDkZyO9okwNwRekrgjM -> Destination: 1sjhKSGkYgaQ2I7lInmxcC9ttC2qjZa0K
+Skipping deletion of object 'Character_Aylora_Body_01.fbx': invalid ID 'file'
+Cancelling monitor task: Source: 1eaT9RQYmJZJrSLDkZyO9okwNwRekrgjM -> Destination: 1coK9am2kXonWiqeMGL5Sxcahd8SeBqw9
+Skipping deletion of object 'Character_Aylora_Body_01.fbx': invalid ID 'file'
+Cancelling monitor task: Source: 1eaT9RQYmJZJrSLDkZyO9okwNwRekrgjM -> Destination: 1Bnc9FQmQkW4atU4xBE4CjZ2e8VyFBr2Z
+Skipping deletion of object 'Character_Aylora_Body_01.fbx': invalid ID 'file'
+Cancelling monitor task: Source: 1WktO7QkDSkqtY5vSlUf7m3zkK9cgPZV- -> Destination: 1H_eRUIak_LQabJhLlkJRvelHQGPkASKi
+Cancelling monitor task: Source: 1kb103Sh5LimC1ncYAK-rAOQhLsxJ4ATC -> Destination: 1TYO62yZgfTWFA_IRYSWKcqEjTqXPxt89
+Cancelling monitor task: Source: 1F8KiYx4dxH4meL1nbTKcu2-WyvVaKh2f -> Destination: 1nI_TPXzm2v36hwGcdpzv2MJ0cMrV_ban
+Cancelling monitor task: Source: 1F8KiYx4dxH4meL1nbTKcu2-WyvVaKh2f -> Destination: 197TKYlpcyJSozVwX6kAk1BE4DXfb1R7C
+Cancelling monitor task: Source: 1F8KiYx4dxH4meL1nbTKcu2-WyvVaKh2f -> Destination: 1Y33W8c5llOA5Znp6MN9LfK9D0Eas9b38
+Cancelling monitor task: Source: 1F8KiYx4dxH4meL1nbTKcu2-WyvVaKh2f -> Destination: 1cw6jke8-N4s9SQJTGJF67oWBHH_RvFLL
+Cancelling monitor task: Source: 1VJCJaQuBFBQ4M9TmjReipBiMj8NNS6gc -> Destination: 1auKQC1KFuhf-PfYSsTRI44tl9AA_9q7H
+Cancelling monitor task: Source: 1zQ-6LirSk5A_1cw-Z3OpuXs3hWsMgxeH -> Destination: 1zbZltijsGNyMIbflbmx-V7t3s7wI5W4F
+Skipping deletion of object 'Body_001.obj': invalid ID 'file'
+Cancelling monitor task: Source: 1zQ-6LirSk5A_1cw-Z3OpuXs3hWsMgxeH -> Destination: 1ZKyE7TXFgiMEi763efwvWT4NzFcH1YDt
+Skipping deletion of object 'Body_001.obj': invalid ID 'file'
+Cancelling monitor task: Source: 1zQ-6LirSk5A_1cw-Z3OpuXs3hWsMgxeH -> Destination: 1SJsZFCPXEHh76_gUdl2ZmzByMq4nrBXy
+Skipping deletion of object 'Body_001.obj': invalid ID 'file'
+Cancelling monitor task: Source: 1zQ-6LirSk5A_1cw-Z3OpuXs3hWsMgxeH -> Destination: 1wFbFMxHCxhm2ydQfn_eDsgl2xF_go7Jr
+Skipping deletion of object 'Body_001.obj': invalid ID 'file'
+Cancelling monitor task: Source: 1JzvMDSz_JPCF-gUQ-oDqymtxDFW8HQ0N -> Destination: 18ukRA_22-Denx6Z-THI_Vn1XvCLLdlV8
+Cancelling monitor task: Source: 1cw6jke8-N4s9SQJTGJF67oWBHH_RvFLL -> Destination: 1gkz-cO4-K2RighAZT-WjaoVhXYoZmHQQ
+Cancelling monitor task: Source: 1WktO7QkDSkqtY5vSlUf7m3zkK9cgPZV- -> Destination: 1as7qijVvUIClOTVYx9OqdYmfi_3aX-iE
+Cancelling monitor task: Source: 1RXe3O7GwA2gDiu2i8--nD001w8LALL9H -> Destination: 1wTpBIBaEuWv-9mm8hR773ZicEAas3-g-
+Cancelling monitor task: Source: 1Na2cNw7AiXEhoqmZIEt7ycFPbDXhyhHL -> Destination: 124ZbjfBQs_aOzrvYB649BG2CdxEGqkP5
+Cancelling monitor task: Source: 1iYNVDlg5imvj3ryIcZYvv5uKASWM7rBp -> Destination: 1ixLqTnZkssExEJ_1zGmDxSu3Kmv1JgeS
+Cancelling monitor task: Source: 18z7vAniBYIC6rjHAIKr0a6f6RjXv2B70 -> Destination: 1eag9A-4_JV4CPyk9xusYbTE5vhU5TDfV
+Cancelling monitor task: Source: 1RXe3O7GwA2gDiu2i8--nD001w8LALL9H -> Destination: 1NWnYCign-Fcr7pkyG8cPioQa-nlQd0NH
+Cancelling monitor task: Source: 1Na2cNw7AiXEhoqmZIEt7ycFPbDXhyhHL -> Destination: 1S860SSVBCrXq_OSHA5VWYJ_2mO1F683M
+Cancelling monitor task: Source: 1TMkw8YwoLGFB3fb8fBCNmFF9UXKxgb1r -> Destination: 1STWfYkJKfbblMiyoQEFnFJdBoYkzxb44
+Cancelling monitor task: Source: 1iYNVDlg5imvj3ryIcZYvv5uKASWM7rBp -> Destination: 1Id7nHQdGH-jIMdllGxNTYwNBaUMTPjMp
+Cancelling monitor task: Source: 17z85GkvgZfm-FIS33gZ8_44wtDhEzAQv -> Destination: 17z85GkvgZfm-FIS33gZ8_44wtDhEzAQv
+Cancelling monitor task: Source: 18z7vAniBYIC6rjHAIKr0a6f6RjXv2B70 -> Destination: 18ukRA_22-Denx6Z-THI_Vn1XvCLLdlV8
+Cancelling monitor task: Source: 17hhakn1lyl18fxmesp2V4YN4rrIDnMji -> Destination: 17hhakn1lyl18fxmesp2V4YN4rrIDnMji
+Cancelling monitor task: Source: 17hhakn1lyl18fxmesp2V4YN4rrIDnMji -> Destination: 1L05yWOVBp1vnLkZbP4PB9oX1TZRPRb3q
+Cancelling monitor task: Source: 14HYqoOUKmMQiufQ-Wd19zLuGiCu1ju9I -> Destination: 1fbgaIGS528HZ1XqEzs-_ajzWtt3MpXbD
+Error deleting object 'Textures': RetryError[<Future at 0x22d95fe55d0 state=finished raised HttpError>]
+Skipping deletion of object 'Textures/C_Aylora_Normal_01.1002.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_Albedo_01.1002.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_AmbientOclusion_01.1002.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_Roughness_01.1002.png': invalid ID 'file'
+Skipping deletion of object 'Textures/C_Aylora_Metalnes_01.1002.png': invalid ID 'file'
+Cancelling monitor task: Source: 1jWtyiu4589yL44ms8TGKEfguxG8cnwid -> Destination: 1jWtyiu4589yL44ms8TGKEfguxG8cnwid
+Cancelling monitor task: Source: 1jWtyiu4589yL44ms8TGKEfguxG8cnwid -> Destination: 1ZjRiZ02RjsoQZNJ3_Yxm6GN-Cb2VhYYQ
+Cancelling monitor task: Source: 1K0TolhWrtvnJOyOK9ioOnJpv9C8m9k4q -> Destination: 1v0PRv3oVsuRRkVh7KGw8sHlRiNPuIgn2
+Cancelling monitor task: Source: 1-NvlhkhE2w3WqveAebC_GgV0vBixzCs1 -> Destination: 1N2DN98CLYk3JDTkteOCrnkWmtqhNSXCc
+Cancelling monitor task: Source: 1U6gZvk1fSUcJSByV4n9Pg5egoeMx4fmF -> Destination: 1Id7nHQdGH-jIMdllGxNTYwNBaUMTPjMp
+Cancelling monitor task: Source: 12-GvgcVGMyqtXl--hhiUznWxNqRS0aZ1 -> Destination: 1lGnec7MwDJbBs6cuH8XZNHHqLe1qso3l
+Cancelling monitor task: Source: 1qV_fwX9tTu8aIm4eV-V3trLVnsV3MJu7 -> Destination: 1YhYeGWn7lpUVDoG4CTtaE2ybl_V2rNxR
+Cancelling monitor task: Source: 1VAmZ3jngsYctTUL3ajQoZH88qv_QnL1n -> Destination: 18ukRA_22-Denx6Z-THI_Vn1XvCLLdlV8
+Cancelling monitor task: Source: 10i-KODABZOrlw7OvCiMWQuKdvyjyvSh_ -> Destination: 1fnXpetADN-4pkFbKcxldIGu7zHkEaE7l
+Cancelling monitor task: Source: 1GD5gnEsV1UEIv6bdpHu2-UzM500goS3h -> Destination: 1L05yWOVBp1vnLkZbP4PB9oX1TZRPRb3q
+Cancelling monitor task: Source: 1ccE8xdj_-YmmttZVqrtiUasnF2fcwMrG -> Destination: 1VmBMWidiaU9qeeqD7ZcBaZHIOLFaqJSw
+Cancelling monitor task: Source: 1F-uNoGz29liiBAbuAsaxhNLD9OfCPtBd -> Destination: 11R53CGJx_ZIdGCBLmKOjzG37_UFH0C6I
+Skipping deletion of object 'Character_Aylora_Cloth_01.fbx': invalid ID 'file'
+Skipping deletion of object 'Character_Aylora_Cloth_for_sim.fbx': invalid ID 'file'
+Cancelling monitor task: Source: 1BYP5w-RrYPmVTQvhDk8ZgyFpOqKEH2GW -> Destination: 1doJNMmxNMtH84gshfyzpddVeYZS1-35P
+Cancelling monitor task: Source: 1doJNMmxNMtH84gshfyzpddVeYZS1-35P -> Destination: 124ZbjfBQs_aOzrvYB649BG2CdxEGqkP5
+Cancelling monitor task: Source: 1XGiDdcPvTzkHvnE_nzHNtguIcZhIAq1U -> Destination: 1bHWD9tqrxuasNdbMHholyAQHzG9ON2p8
+Skipping deletion of object 'Kae.zprj': invalid ID 'file'
+Skipping deletion of object 'Character_Kae_OBJ_Version1.mtl': invalid ID 'file'
+Skipping deletion of object 'Character_Kae_OBJ_Version1.obj': invalid ID 'file'
+Skipping deletion of object 'Character_Kae_OBJ_Version1_diffuse_1001.png': invalid ID 'file'
+Skipping deletion of object 'Charactar_Kae_FBX_Version1.fbx': invalid ID 'file'
+Skipping deletion of object 'Charactar_Kae_FBX_Version1_diffuse_1001.png': invalid ID 'file'
+Cancelling monitor task: Source: 1U2eCDf1QNh6AppGoa3nhdDYhw_8hhqVk -> Destination: 1VTgYUcKvB-ee1gN86GCkyzq18Mn0rBFb
+Cancelling monitor task: Source: 14vDS64WALX9zfmqU6ygul8yxC6kg0vq6 -> Destination: 16fSD67HsxnmyeIj1gEnySc29UmHbyz_i
+Cancelling monitor task: Source: 1DP2dclFTYt_dmA9wQb-cx-TI4qixQZ5a -> Destination: 1JjDXDg5ohAF3yer6nTHTg9-J12qLfbNX
+Cancelling monitor task: Source: 1kO834fQyf30RXqJFjgeTPVj1KgCSf8Y5 -> Destination: 1KplPN-5a2pHySMJziK8SHFGIexQWNOSR
+Cancelling monitor task: Source: 1-VqQ3_SPL5HMfWFx4VKtK7U-MQ4r_Q0C -> Destination: 1L9OWxHgZftQKhv5DVNXa6CX4NKezH9Il
+Cancelling monitor task: Source: 1tkQrPaQh3bemM4HmmYS9Tj6gmZqjRgS4 -> Destination: 1fZL_8J2t53BXTCSLnSoeo4oKTKDUQ2kO
+Skipping deletion of object 'priestessassist.png': invalid ID 'file'
 
