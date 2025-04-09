@@ -12,7 +12,7 @@ from drive_service import (
 )
 from config import GOOGLE_ROOT_ID
 
-# Файлы для хранения мониторинговых задач и журнала изменений
+# Файлы для хранения задач мониторинга и журнала изменений
 MONITOR_TASKS_FILE = "monitor_tasks.json"
 CHANGES_LOG_FILE = "changes_log.json"
 
@@ -49,11 +49,6 @@ def add_change_record(operation, file_name, file_id, source_id="", dest_id="", c
 
 
 def add_monitor_task(source_id, dest_id, copied_map=None):
-    """
-    Добавляет новую задачу мониторинга в monitor_tasks.json.
-    copied_files теперь хранится как словарь, где ключ – относительный путь.
-    Возвращает True, если задача добавлена, или False, если такая задача уже существует.
-    """
     if copied_map is None:
         copied_map = {}
     tasks = load_json(MONITOR_TASKS_FILE)
@@ -88,10 +83,6 @@ def get_monitor_tasks():
 
 
 def check_monitor_tasks(log_callback):
-    """
-    Проверяем задачи мониторинга и рекурсивно копируем новые файлы/подпапки.
-    Если появляются новые объекты, они копируются, а словарь copied_files обновляется.
-    """
     tasks = load_json(MONITOR_TASKS_FILE)
     updated = False
     for task in tasks:
@@ -126,42 +117,32 @@ class DriveApp:
         self.frame_commands = tk.Frame(master)
         self.frame_commands.pack(side=tk.TOP, fill=tk.X, padx=10, pady=10)
 
+        # Команды: оставлены только базовые и новая кнопка "Отменить все операции"
         commands = [
             ("Copy", self.copy_files),
             ("Monitor", self.show_monitor_tasks),
             ("AddMonitor", self.add_monitor_task_cmd),
             ("RemoveMonitor", self.remove_monitor_task_cmd),
             ("Report", self.show_report),
-            ("FolderReport", self.folder_report),
-            ("Move", self.move_file),
-            ("Delete", self.delete_file),
             ("SetPermissions", self.set_permissions),
-            ("Cancel", self.cancel_operation)
+            ("Отменить все операции", self.cancel_all_operations)
         ]
         for (text, cmd) in commands:
-            btn = tk.Button(self.frame_commands, text=text, width=12, command=cmd)
+            btn = tk.Button(self.frame_commands, text=text, width=20, command=cmd)
             btn.pack(side=tk.LEFT, padx=5)
 
         self.log_area = scrolledtext.ScrolledText(master, width=100, height=25)
         self.log_area.pack(padx=10, pady=10)
 
-        # Запускаем фоновый мониторинг в отдельном потоке
         self.monitor_thread = threading.Thread(target=monitor_worker, args=(self.threadsafe_log,), daemon=True)
         self.monitor_thread.start()
 
     def threadsafe_log(self, message):
-        """
-        Безопасная обёртка для записи в log_area из фонового потока.
-        Используем метод after, чтобы вызывать self.log в основном потоке Tkinter.
-        """
         self.master.after(0, lambda: self.log(message))
 
     def log(self, message):
         self.log_area.insert(tk.END, message + "\n")
         self.log_area.see(tk.END)
-
-    def cancel_operation(self):
-        self.log("Операция отменена.")
 
     def copy_files(self):
         source_link = simpledialog.askstring("Copy", "Введите ссылку на исходную папку:")
@@ -175,7 +156,6 @@ class DriveApp:
         if not source_id:
             messagebox.showerror("Ошибка", "Не удалось извлечь ID исходной папки.")
             return
-
         if dest_link.strip() == "":
             dest_id = GOOGLE_ROOT_ID
         else:
@@ -184,20 +164,17 @@ class DriveApp:
                 messagebox.showerror("Ошибка", "Не удалось извлечь ID целевой папки.")
                 return
 
-        # Запускаем копирование в фоновом потоке
         def worker():
-            self.threadsafe_log("Начинаем рекурсивное копирование...")
+            self.threadsafe_log("Начинаем рекурсивное копирование (Copy)...")
             try:
                 copied_map = copy_new_items(source_id, dest_id, {}, base_path="")
                 self.threadsafe_log(f"Копирование завершено. Скопировано объектов: {len(copied_map)}")
-                # Проверяем, нет ли уже задачи мониторинга
                 tasks = get_monitor_tasks()
                 exists = any(t["source_folder_id"] == source_id and t["dest_folder_id"] == dest_id for t in tasks)
                 if not exists:
                     add_monitor_task(source_id, dest_id, copied_map)
                     self.threadsafe_log("Задача мониторинга создана.")
-                add_change_record("copy", "(множество объектов)", "(множество)",
-                                  source_id, dest_id, "Рекурсивное копирование через Copy")
+                add_change_record("copy", "(множество объектов)", "(множество)", source_id, dest_id, "Рекурсивное копирование через Copy")
             except Exception as e:
                 self.threadsafe_log(f"Ошибка при копировании: {e}")
 
@@ -243,14 +220,13 @@ class DriveApp:
                 messagebox.showerror("Ошибка", "Не удалось извлечь ID целевой папки.")
                 return
 
-        # Запускаем копирование (при создании задачи) в фоновом потоке
         def worker():
             self.threadsafe_log("Идёт первичное копирование для AddMonitor...")
             try:
                 copied_map = copy_new_items(source_id, dest_id, {}, base_path="")
+                self.threadsafe_log(f"Первичное копирование завершено. Скопировано объектов: {len(copied_map)}")
                 if add_monitor_task(source_id, dest_id, copied_map):
-                    self.threadsafe_log(f"Новая задача мониторинга добавлена:\n"
-                                        f"Исходная: {source_id}\nЦелевая: {dest_id}")
+                    self.threadsafe_log(f"Новая задача мониторинга добавлена:\nИсходная: {source_id}\nЦелевая: {dest_id}")
                 else:
                     self.threadsafe_log("Такая задача уже существует!")
             except Exception as e:
@@ -284,6 +260,27 @@ class DriveApp:
         else:
             self.log("Задача мониторинга с такими путями не найдена.")
 
+    def cancel_all_operations(self):
+        """
+        Удаляет все объекты, скопированные через AddMonitor, и очищает задачи мониторинга.
+        """
+        self.log("Запуск отмены всех операций...")
+        tasks = get_monitor_tasks()
+        if not tasks:
+            self.log("Нет задач мониторинга для отмены.")
+            return
+        for task in tasks:
+            copied_map = task.get("copied_files", {})
+            for rel_path, obj_id in copied_map.items():
+                try:
+                    delete_file(obj_id)
+                    self.log(f"Удалён объект {rel_path} (ID: {obj_id})")
+                except Exception as e:
+                    self.log(f"Ошибка при удалении объекта {rel_path}: {e}")
+        # Очистить файл задач мониторинга
+        save_json(MONITOR_TASKS_FILE, [])
+        self.log("Все задачи мониторинга отменены, все скопированные объекты удалены.")
+
     def show_report(self):
         changes = load_json(CHANGES_LOG_FILE)
         report_lines = ["==== Полный отчёт по изменениям ===="]
@@ -307,73 +304,6 @@ class DriveApp:
         txt = scrolledtext.ScrolledText(win, width=100, height=30)
         txt.insert(tk.END, report)
         txt.pack()
-
-    def folder_report(self):
-        link = simpledialog.askstring("FolderReport", "Введите ссылку на папку (или подпапку):")
-        if not link:
-            return
-        folder_id = extract_folder_id(link)
-        if not folder_id:
-            messagebox.showerror("Ошибка", "Не удалось извлечь ID папки.")
-            return
-        report = get_file_hierarchy(folder_id)
-        win = tk.Toplevel(self.master)
-        win.title("Отчёт по папке")
-        txt = scrolledtext.ScrolledText(win, width=100, height=30)
-        txt.insert(tk.END, report)
-        txt.pack()
-
-    def move_file(self):
-        file_link = simpledialog.askstring("Move", "Введите ссылку на файл (или папку):")
-        if not file_link:
-            return
-        file_id = extract_file_id(file_link)
-        if not file_id:
-            file_id = extract_folder_id(file_link)
-            if not file_id:
-                messagebox.showerror("Ошибка", "Не удалось извлечь ID файла/папки.")
-                return
-        dest_link = simpledialog.askstring("Move", "Введите ссылку на целевую папку (или оставьте пустым для корневой):")
-        if dest_link is None:
-            return
-        if dest_link.strip() == "":
-            dest_id = GOOGLE_ROOT_ID
-        else:
-            dest_id = extract_folder_id(dest_link)
-            if not dest_id:
-                messagebox.showerror("Ошибка", "Не удалось извлечь ID целевой папки.")
-                return
-        try:
-            updated = move_file(file_id, dest_id)
-            self.log(f"Файл/папка успешно перемещён. Новые родительские папки: {updated.get('parents', [])}")
-            messagebox.showinfo("Move", "Операция перемещения выполнена.")
-            add_change_record("move", updated["name"], updated["id"], "(неизвестно)", dest_id, "Перемещение через Move")
-        except Exception as e:
-            self.log(f"Ошибка при перемещении: {e}")
-            messagebox.showerror("Ошибка", "Ошибка при перемещении.")
-
-    def delete_file(self):
-        file_link = simpledialog.askstring("Delete", "Введите ссылку на файл (или папку) для удаления:")
-        if not file_link:
-            return
-        file_id = extract_file_id(file_link)
-        if not file_id:
-            file_id = extract_folder_id(file_link)
-            if not file_id:
-                messagebox.showerror("Ошибка", "Не удалось извлечь ID файла/папки.")
-                return
-        answer = messagebox.askyesno("Подтверждение", "Вы действительно хотите удалить этот файл/папку?")
-        if not answer:
-            self.log("Удаление отменено.")
-            return
-        try:
-            delete_file(file_id)
-            self.log("Файл/папка успешно удалены.")
-            add_change_record("delete", "(unknown)", file_id, comment="Удаление через Delete")
-            messagebox.showinfo("Delete", "Файл/папка удалены.")
-        except Exception as e:
-            self.log(f"Ошибка при удалении: {e}")
-            messagebox.showerror("Ошибка", "Ошибка при удалении.")
 
     def set_permissions(self):
         file_link = simpledialog.askstring("SetPermissions", "Введите ссылку на файл (или папку):")
