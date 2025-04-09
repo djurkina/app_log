@@ -276,17 +276,23 @@ class DriveApp:
             if not tasks:
                 self.threadsafe_log("No monitor tasks to cancel.")
                 return
+            # For each monitor task, log detailed info and delete each copied object if its ID is valid.
             for task in tasks:
                 source_id = task.get("source_folder_id", "Unknown")
                 dest_id = task.get("dest_folder_id", "Unknown")
                 self.threadsafe_log(f"Cancelling monitor task: Source: {source_id} -> Destination: {dest_id}")
                 copied_map = task.get("copied_files", {})
                 for rel_path, obj_id in copied_map.items():
+                    # Проверяем, что ID выглядит корректно (например, длина больше 5 символов)
+                    if not obj_id or len(obj_id.strip()) < 5:
+                        self.threadsafe_log(f"Skipping deletion of object '{rel_path}': invalid ID '{obj_id}'")
+                        continue
                     try:
                         delete_file(obj_id)
                         self.threadsafe_log(f"Deleted object '{rel_path}' (ID: {obj_id})")
                     except Exception as e:
                         self.threadsafe_log(f"Error deleting object '{rel_path}': {e}")
+            # Clear the monitor tasks file
             save_json(MONITOR_TASKS_FILE, [])
             self.threadsafe_log("All monitor tasks cancelled; all copied objects deleted.")
         threading.Thread(target=worker, daemon=True).start()
