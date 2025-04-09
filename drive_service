@@ -8,7 +8,7 @@ from config import SERVICE_ACCOUNT_FILE
 
 SCOPES = ["https://www.googleapis.com/auth/drive"]
 
-@retry(wait=wait_fixed(2), stop=stop_after_attempt(3))
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
 def get_drive_service():
     if not os.path.exists(SERVICE_ACCOUNT_FILE):
         raise FileNotFoundError(f"Service account file not found: {SERVICE_ACCOUNT_FILE}")
@@ -44,7 +44,7 @@ def extract_file_id(url: str) -> str:
         return match.group(1)
     return None
 
-@retry(wait=wait_fixed(2), stop_after_attempt(3))
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
 def list_files_in_folder(folder_id: str) -> list:
     service = get_drive_service()
     query = f"'{folder_id}' in parents and trashed = false"
@@ -56,7 +56,7 @@ def list_files_in_folder(folder_id: str) -> list:
     ).execute()
     return results.get("files", [])
 
-@retry(wait=wait_fixed(2), stop_after_attempt(3))
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
 def copy_file(file_id: str, file_name: str, dest_folder_id: str) -> dict:
     service = get_drive_service()
     body = {"name": file_name, "parents": [dest_folder_id]}
@@ -67,7 +67,7 @@ def copy_file(file_id: str, file_name: str, dest_folder_id: str) -> dict:
     ).execute()
     return new_file
 
-@retry(wait=wait_fixed(2), stop_after_attempt(3))
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
 def delete_file(file_id: str) -> None:
     service = get_drive_service()
     service.files().delete(
@@ -75,7 +75,7 @@ def delete_file(file_id: str) -> None:
         supportsAllDrives=True
     ).execute()
 
-@retry(wait=wait_fixed(2), stop_after_attempt(3))
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
 def set_file_permission(file_id: str, email: str, role: str) -> str:
     service = get_drive_service()
     permission_body = {
@@ -91,7 +91,7 @@ def set_file_permission(file_id: str, email: str, role: str) -> str:
     ).execute()
     return result.get("id")
 
-@retry(wait=wait_fixed(2), stop_after_attempt(3))
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
 def get_file_hierarchy(file_id: str) -> str:
     service = get_drive_service()
     file = service.files().get(
@@ -124,7 +124,7 @@ def get_file_hierarchy(file_id: str) -> str:
             report += "No child files/folders.\n"
     return report
 
-@retry(wait=wait_fixed(2), stop_after_attempt(3))
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
 def find_folder(name: str, parent_id: str) -> str:
     service = get_drive_service()
     safe_name = name.replace("'", "\\'")
@@ -140,7 +140,7 @@ def find_folder(name: str, parent_id: str) -> str:
          return files[0]["id"]
     return None
 
-@retry(wait=wait_fixed(2), stop_after_attempt(3))
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
 def create_folder(name: str, parent_id: str) -> str:
     """
     Creates a folder with the given name in the parent folder.
