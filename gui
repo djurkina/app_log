@@ -7,7 +7,7 @@ from datetime import datetime
 
 from drive_service import (
     extract_file_id, extract_folder_id, list_files_in_folder,
-    copy_file, move_file, delete_file, set_file_permission,
+    copy_file, delete_file, set_file_permission,
     get_file_hierarchy, copy_new_items
 )
 from config import GOOGLE_ROOT_ID
@@ -92,12 +92,12 @@ def check_monitor_tasks(log_callback):
         try:
             new_map = copy_new_items(source_id, dest_id, copied_map.copy(), base_path="")
         except Exception as e:
-            log_callback(f"[Мониторинг] Ошибка копирования: {e}")
+            log_callback(f"[Monitor] Copy error: {e}")
             continue
         if len(new_map) > len(copied_map):
             task["copied_files"] = new_map
             updated = True
-            log_callback(f"[Мониторинг] Обнаружены и скопированы новые файлы/папки.")
+            log_callback(f"[Monitor] New files/folders copied.")
     if updated:
         save_json(MONITOR_TASKS_FILE, tasks)
 
@@ -112,28 +112,35 @@ class DriveApp:
     def __init__(self, master):
         self.master = master
         master.title("Google Drive Manager")
-        master.geometry("800x600")
+        master.geometry("900x600")
 
+        # Frame for main commands
         self.frame_commands = tk.Frame(master)
-        self.frame_commands.pack(side=tk.TOP, fill=tk.X, padx=10, pady=10)
+        self.frame_commands.pack(side=tk.TOP, fill=tk.X, padx=10, pady=5)
 
-        # Команды: оставлены только базовые и новая кнопка "Отменить все операции"
+        # List of main commands in one row
         commands = [
             ("Copy", self.copy_files),
             ("Monitor", self.show_monitor_tasks),
             ("AddMonitor", self.add_monitor_task_cmd),
             ("RemoveMonitor", self.remove_monitor_task_cmd),
             ("Report", self.show_report),
-            ("SetPermissions", self.set_permissions),
-            ("Отменить все операции", self.cancel_all_operations)
+            ("SetPermissions", self.set_permissions)
         ]
         for (text, cmd) in commands:
             btn = tk.Button(self.frame_commands, text=text, width=20, command=cmd)
             btn.pack(side=tk.LEFT, padx=5)
 
+        # Separate frame for the cancel all operations button
+        self.frame_cancel = tk.Frame(master)
+        self.frame_cancel.pack(side=tk.TOP, fill=tk.X, padx=10, pady=5)
+        btn_cancel = tk.Button(self.frame_cancel, text="Cancel All Operations", width=25, command=self.cancel_all_operations)
+        btn_cancel.pack(side=tk.LEFT, padx=5)
+
         self.log_area = scrolledtext.ScrolledText(master, width=100, height=25)
         self.log_area.pack(padx=10, pady=10)
 
+        # Start background monitoring tasks
         self.monitor_thread = threading.Thread(target=monitor_worker, args=(self.threadsafe_log,), daemon=True)
         self.monitor_thread.start()
 
@@ -145,52 +152,53 @@ class DriveApp:
         self.log_area.see(tk.END)
 
     def copy_files(self):
-        source_link = simpledialog.askstring("Copy", "Введите ссылку на исходную папку:")
+        source_link = simpledialog.askstring("Copy", "Enter source folder URL:")
         if source_link is None:
             return
-        dest_link = simpledialog.askstring("Copy", "Введите ссылку на целевую папку (оставьте пустым для корневой):")
+        dest_link = simpledialog.askstring("Copy", "Enter destination folder URL (leave blank for root):")
         if dest_link is None:
             return
 
         source_id = extract_folder_id(source_link)
         if not source_id:
-            messagebox.showerror("Ошибка", "Не удалось извлечь ID исходной папки.")
+            messagebox.showerror("Error", "Could not extract source folder ID.")
             return
+
         if dest_link.strip() == "":
             dest_id = GOOGLE_ROOT_ID
         else:
             dest_id = extract_folder_id(dest_link)
             if not dest_id:
-                messagebox.showerror("Ошибка", "Не удалось извлечь ID целевой папки.")
+                messagebox.showerror("Error", "Could not extract destination folder ID.")
                 return
 
         def worker():
-            self.threadsafe_log("Начинаем рекурсивное копирование (Copy)...")
+            self.threadsafe_log("Starting recursive copy (Copy)...")
             try:
                 copied_map = copy_new_items(source_id, dest_id, {}, base_path="")
-                self.threadsafe_log(f"Копирование завершено. Скопировано объектов: {len(copied_map)}")
+                self.threadsafe_log(f"Copy finished. Total objects copied: {len(copied_map)}")
                 tasks = get_monitor_tasks()
                 exists = any(t["source_folder_id"] == source_id and t["dest_folder_id"] == dest_id for t in tasks)
                 if not exists:
                     add_monitor_task(source_id, dest_id, copied_map)
-                    self.threadsafe_log("Задача мониторинга создана.")
-                add_change_record("copy", "(множество объектов)", "(множество)", source_id, dest_id, "Рекурсивное копирование через Copy")
+                    self.threadsafe_log("Monitor task created.")
+                add_change_record("copy", "(multiple objects)", "(multiple)", source_id, dest_id, "Recursive copy via Copy")
             except Exception as e:
-                self.threadsafe_log(f"Ошибка при копировании: {e}")
+                self.threadsafe_log(f"Copy error: {e}")
 
         threading.Thread(target=worker, daemon=True).start()
 
     def show_monitor_tasks(self):
         tasks = get_monitor_tasks()
         if not tasks:
-            messagebox.showinfo("Monitor", "Нет мониторинговых задач.")
+            messagebox.showinfo("Monitor", "No monitor tasks.")
             return
         win = tk.Toplevel(self.master)
-        win.title("Мониторинговые задачи")
+        win.title("Monitor Tasks")
         tree = ttk.Treeview(win, columns=("Source", "Destination", "CopiedCount"), show="headings")
-        tree.heading("Source", text="Исходная папка")
-        tree.heading("Destination", text="Целевая папка")
-        tree.heading("CopiedCount", text="Скопировано объектов")
+        tree.heading("Source", text="Source Folder")
+        tree.heading("Destination", text="Destination Folder")
+        tree.heading("CopiedCount", text="Objects Copied")
         tree.pack(fill=tk.BOTH, expand=True)
         for task in tasks:
             tree.insert("", tk.END,
@@ -201,135 +209,136 @@ class DriveApp:
                         ))
 
     def add_monitor_task_cmd(self):
-        source_link = simpledialog.askstring("AddMonitor", "Введите ссылку на исходную папку:")
+        source_link = simpledialog.askstring("AddMonitor", "Enter source folder URL:")
         if source_link is None:
             return
-        dest_link = simpledialog.askstring("AddMonitor", "Введите ссылку на целевую папку (оставьте пустым для корневой):")
+        dest_link = simpledialog.askstring("AddMonitor", "Enter destination folder URL (leave blank for root):")
         if dest_link is None:
             return
 
         source_id = extract_folder_id(source_link)
         if not source_id:
-            messagebox.showerror("Ошибка", "Не удалось извлечь ID исходной папки.")
+            messagebox.showerror("Error", "Could not extract source folder ID.")
             return
+
         if dest_link.strip() == "":
             dest_id = GOOGLE_ROOT_ID
         else:
             dest_id = extract_folder_id(dest_link)
             if not dest_id:
-                messagebox.showerror("Ошибка", "Не удалось извлечь ID целевой папки.")
+                messagebox.showerror("Error", "Could not extract destination folder ID.")
                 return
 
         def worker():
-            self.threadsafe_log("Идёт первичное копирование для AddMonitor...")
+            self.threadsafe_log("Starting initial copy for AddMonitor...")
             try:
                 copied_map = copy_new_items(source_id, dest_id, {}, base_path="")
-                self.threadsafe_log(f"Первичное копирование завершено. Скопировано объектов: {len(copied_map)}")
+                self.threadsafe_log(f"Initial copy finished. Total objects copied: {len(copied_map)}")
                 if add_monitor_task(source_id, dest_id, copied_map):
-                    self.threadsafe_log(f"Новая задача мониторинга добавлена:\nИсходная: {source_id}\nЦелевая: {dest_id}")
+                    self.threadsafe_log(f"New monitor task added:\nSource: {source_id}\nDestination: {dest_id}")
                 else:
-                    self.threadsafe_log("Такая задача уже существует!")
+                    self.threadsafe_log("Monitor task already exists!")
             except Exception as e:
-                self.threadsafe_log(f"Ошибка при первоначальном копировании: {e}")
+                self.threadsafe_log(f"Initial copy error: {e}")
 
         threading.Thread(target=worker, daemon=True).start()
 
     def remove_monitor_task_cmd(self):
-        source_link = simpledialog.askstring("RemoveMonitor", "Введите ссылку на исходную папку:")
+        source_link = simpledialog.askstring("RemoveMonitor", "Enter source folder URL:")
         if source_link is None:
             return
-        dest_link = simpledialog.askstring("RemoveMonitor", "Введите ссылку на целевую папку (оставьте пустым для корневой):")
+        dest_link = simpledialog.askstring("RemoveMonitor", "Enter destination folder URL (leave blank for root):")
         if dest_link is None:
             return
 
         source_id = extract_folder_id(source_link)
         if not source_id:
-            messagebox.showerror("Ошибка", "Не удалось извлечь ID исходной папки.")
+            messagebox.showerror("Error", "Could not extract source folder ID.")
             return
         if dest_link.strip() == "":
             dest_id = GOOGLE_ROOT_ID
         else:
             dest_id = extract_folder_id(dest_link)
             if not dest_id:
-                messagebox.showerror("Ошибка", "Не удалось извлечь ID целевой папки.")
+                messagebox.showerror("Error", "Could not extract destination folder ID.")
                 return
 
         removed = remove_monitor_task(source_id, dest_id)
         if removed:
-            self.log(f"Задача мониторинга удалена:\nИсходная: {source_id}\nЦелевая: {dest_id}")
+            self.log(f"Monitor task removed:\nSource: {source_id}\nDestination: {dest_id}")
         else:
-            self.log("Задача мониторинга с такими путями не найдена.")
+            self.log("No monitor task found with the given paths.")
 
     def cancel_all_operations(self):
         """
-        Удаляет все объекты, скопированные через AddMonitor, и очищает задачи мониторинга.
+        Deletes all objects copied via AddMonitor and clears monitor tasks.
         """
-        self.log("Запуск отмены всех операций...")
+        self.log("Starting cancellation of all operations...")
         tasks = get_monitor_tasks()
         if not tasks:
-            self.log("Нет задач мониторинга для отмены.")
+            self.log("No monitor tasks to cancel.")
             return
         for task in tasks:
             copied_map = task.get("copied_files", {})
             for rel_path, obj_id in copied_map.items():
                 try:
                     delete_file(obj_id)
-                    self.log(f"Удалён объект {rel_path} (ID: {obj_id})")
+                    self.log(f"Deleted object {rel_path} (ID: {obj_id})")
                 except Exception as e:
-                    self.log(f"Ошибка при удалении объекта {rel_path}: {e}")
-        # Очистить файл задач мониторинга
+                    self.log(f"Error deleting object {rel_path}: {e}")
+        # Clear monitor tasks file
         save_json(MONITOR_TASKS_FILE, [])
-        self.log("Все задачи мониторинга отменены, все скопированные объекты удалены.")
+        self.log("All monitor tasks cancelled; all copied objects deleted.")
 
     def show_report(self):
         changes = load_json(CHANGES_LOG_FILE)
-        report_lines = ["==== Полный отчёт по изменениям ===="]
+        report_lines = ["==== Full Change Report ===="]
         report_lines.append(f"Google Root ID: {GOOGLE_ROOT_ID}")
         report_lines.append("")
         if changes:
             for rec in sorted(changes, key=lambda x: x["timestamp"]):
-                line = f"{rec['timestamp']} | {rec['operation']} | Файл: {rec['file_name']} (ID: {rec['file_id']})"
+                line = f"{rec['timestamp']} | {rec['operation']} | File: {rec['file_name']} (ID: {rec['file_id']})"
                 if rec['source_folder_id']:
-                    line += f" | От: {rec['source_folder_id']}"
+                    line += f" | From: {rec['source_folder_id']}"
                 if rec['dest_folder_id']:
-                    line += f" | В: {rec['dest_folder_id']}"
+                    line += f" | To: {rec['dest_folder_id']}"
                 if rec['comment']:
                     line += f" | {rec['comment']}"
                 report_lines.append(line)
         else:
-            report_lines.append("Журнал изменений пуст.")
+            report_lines.append("No change records found.")
         report = "\n".join(report_lines)
         win = tk.Toplevel(self.master)
-        win.title("Отчёт изменений")
+        win.title("Change Report")
         txt = scrolledtext.ScrolledText(win, width=100, height=30)
         txt.insert(tk.END, report)
         txt.pack()
 
     def set_permissions(self):
-        file_link = simpledialog.askstring("SetPermissions", "Введите ссылку на файл (или папку):")
+        file_link = simpledialog.askstring("SetPermissions", "Enter file/folder URL:")
         if not file_link:
             return
         file_id = extract_file_id(file_link)
         if not file_id:
             file_id = extract_folder_id(file_link)
             if not file_id:
-                messagebox.showerror("Ошибка", "Не удалось извлечь ID файла/папки.")
+                messagebox.showerror("Error", "Could not extract file/folder ID.")
                 return
-        email = simpledialog.askstring("SetPermissions", "Введите email пользователя:")
+        email = simpledialog.askstring("SetPermissions", "Enter user email:")
         if not email:
             return
-        role = simpledialog.askstring("SetPermissions", "Введите роль (reader, writer, owner):")
+        role = simpledialog.askstring("SetPermissions", "Enter role (reader, writer, owner):")
         if not role or role.lower() not in ['reader', 'writer', 'owner']:
-            messagebox.showerror("Ошибка", "Некорректная роль.")
+            messagebox.showerror("Error", "Invalid role.")
             return
         try:
             perm_id = set_file_permission(file_id, email, role.lower())
-            self.log(f"Права успешно изменены. ID разрешения: {perm_id}")
-            add_change_record("setpermissions", "(unknown)", file_id, comment=f"Права {role} для {email}")
-            messagebox.showinfo("SetPermissions", "Права успешно изменены.")
+            self.log(f"Permissions set successfully. Permission ID: {perm_id}")
+            add_change_record("setpermissions", "(unknown)", file_id, comment=f"Permissions {role} for {email}")
+            messagebox.showinfo("SetPermissions", "Permissions set successfully.")
         except Exception as e:
-            self.log(f"Ошибка при изменении прав: {e}")
-            messagebox.showerror("Ошибка", "Ошибка при изменении прав.")
+            self.log(f"Error setting permissions: {e}")
+            messagebox.showerror("Error", "Error setting permissions.")
 
 
 if __name__ == '__main__':
