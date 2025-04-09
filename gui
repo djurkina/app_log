@@ -13,7 +13,7 @@ from drive_service import (
 )
 from config import GOOGLE_ROOT_ID
 
-# Files for monitor tasks and change logs
+# Files to store monitor tasks and change logs
 MONITOR_TASKS_FILE = "monitor_tasks.json"
 CHANGES_LOG_FILE = "changes_log.json"
 
@@ -282,7 +282,7 @@ class DriveApp:
                 self.threadsafe_log(f"Cancelling monitor task: Source: {source_id} -> Destination: {dest_id}")
                 copied_map = task.get("copied_files", {})
                 for rel_path, obj_id in copied_map.items():
-                    # Check that obj_id is valid: must be a non-empty string with a reasonable length.
+                    # Check that the object ID is valid
                     if not obj_id or len(obj_id.strip()) < 5 or obj_id.lower() == "file":
                         self.threadsafe_log(f"Skipping deletion of object '{rel_path}': invalid ID '{obj_id}'")
                         continue
