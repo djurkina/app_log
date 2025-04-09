@@ -170,9 +170,9 @@ def create_folder(name: str, parent_id: str) -> str:
 def copy_new_items(src_id: str, dest_id: str, copied_map: dict, base_path="") -> dict:
     """
     Recursively copies files and folders from src_id to dest_id.
-    For files, the new file ID is stored;
-    for folders – the ID of the created folder.
-    The base_path parameter builds a relative path for logging.
+    For files, stores the new file ID;
+    for folders – the created folder's ID.
+    base_path is used to build a relative path for logging.
     Returns the updated dictionary.
     """
     items = list_files_in_folder(src_id)
