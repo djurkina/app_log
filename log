@@ -1,6 +1,14 @@
-Starting cancellation of all operations...
-Cancelling monitor task: Source: 1GGjhdjsKndJ2D_bYmXEuscqU8vjxD0St -> Destination: 1AEU5KOykAcffQJTNvg01Lncp8NsrN2t4
-Error deleting object 'try': RetryError[<Future at 0x18b4dea5b50 state=finished raised HttpError>]
-Error deleting object 'try/u3635397544_A_3D_concept_of_a_detailed_staff_in_the_style_of__56e4adb7-54e3-45f8-b8b3-5707522d0939_2.png': RetryError[<Future at 0x18b4ddce4d0 state=finished raised HttpError>]
-Error deleting object 'image (27).png': RetryError[<Future at 0x18b4f0b55d0 state=finished raised HttpError>]
-Cancelling monitor task: Source: 1eaT9RQYmJZJrSLDkZyO9okwNwRekrgjM -> Destination: 1c4UtHG1hsE2SavZ-0rgizO7tZhlFWc37
+Traceback (most recent call last):
+  File "C:\Users\Admin\PycharmProjects\PythonProject\gui.py", line 347, in <module>
+    root.mainloop()
+    ~~~~~~~~~~~~~^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\tkinter\__init__.py", line 1599, in mainloop
+    self.tk.mainloop(n)
+    ~~~~~~~~~~~~~~~~^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python313\Lib\tkinter\__init__.py", line 2063, in __call__
+    def __call__(self, *args):
+    
+KeyboardInterrupt
+
+Process finished with exit code -1073741510 (0xC000013A: interrupted by Ctrl+C)
+
